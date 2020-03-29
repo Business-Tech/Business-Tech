@@ -4,7 +4,7 @@ import tkinter.messagebox as tm
 import sqlite3
 
 def new_user():
-	db = sqlite3.connect('login_database.db')
+	db = sqlite3.connect('database.db')
 	cursor = db.cursor()
 	cursor.execute('CREATE TABLE IF NOT EXISTS login (id TEXT, first_name TEXT, last_name TEXT, email TEXT, mdp TEXT)')
 	cursor.execute('INSERT INTO login VALUES (:id, :first_name, :last_name, :email, :mdp)',
@@ -22,7 +22,7 @@ window = tk.Tk()
 window.title('BusinessTech')
 window.geometry('230x160')
 window.resizable(width=False, height=False)
-icon = tk.PhotoImage(file='bt.png')
+icon = tk.PhotoImage(file='bt.gif')
 window.iconphoto(True, icon)
 
 ID = StringVar()

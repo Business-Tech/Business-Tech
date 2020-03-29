@@ -4,7 +4,7 @@ import tkinter.messagebox as tm
 import sqlite3
 
 def remove_user():
-	db = sqlite3.connect('login_database.db')
+	db = sqlite3.connect('database.db')
 	cursor = db.cursor()
 	PASS = ("'" + ID.get() + "'")
 	cursor.execute("DELETE FROM login WHERE id = " + PASS)
@@ -15,7 +15,7 @@ window = tk.Tk()
 window.title('BusinessTech')
 window.geometry('230x70')
 window.resizable(width=False, height=False)
-icon = tk.PhotoImage(file='bt.png')
+icon = tk.PhotoImage(file='bt.gif')
 window.iconphoto(True, icon)
 
 ID = StringVar()
