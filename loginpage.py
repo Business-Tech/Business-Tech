@@ -14,11 +14,23 @@ def verif():
 	for i in user_list:
 		if ident in i:
 			if passw in i:
+				PASS = ("'" + ID.get() + "'")
+				cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+				first = cursor.fetchone()[1]
+				cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+				last = cursor.fetchone()[2]
+				user = sqlite3.connect('user_database.db')
+				cur = user.cursor()
+				cur.execute('CREATE TABLE IF NOT EXISTS us_er (first_name TEXT, last_name TEXT)')
+				cur.execute('INSERT INTO us_er VALUES (:first_name, :last_name)',
+					{
+						'first_name':''+first,
+						'last_name':''+last,
+					})
+				user.commit()
+				user.close()
 				window.destroy()
 				os.system("python Nolann.py")
-		else:
-			print('ERROR : Login or Password')
-			print('Try Again')
 
 window = tk.Tk()
 window.title('BusinessTech')

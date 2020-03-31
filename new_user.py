@@ -17,6 +17,7 @@ def new_user():
 		})
 	db.commit()
 	db.close()
+	window.destroy()
 
 window = tk.Tk()
 window.title('BusinessTech')
@@ -31,12 +32,12 @@ entry_ID = Entry(window, textvariable=ID, width=30, bg='white')
 entry_ID.pack(pady=2)
 
 FIRST_NAME = StringVar()
-FIRST_NAME.set('Nom')
+FIRST_NAME.set('Prénom')
 entry_FIRST_NAME = Entry(window, textvariable=FIRST_NAME, width=30, bg='white')
 entry_FIRST_NAME.pack(pady=2)
 
 LAST_NAME = StringVar()
-LAST_NAME.set('Prénom')
+LAST_NAME.set('Nom')
 entry_LAST_NAME = Entry(window, textvariable=LAST_NAME, width=30, bg='white')
 entry_LAST_NAME.pack(pady=2)
 

@@ -10,6 +10,7 @@ def remove_user():
 	cursor.execute("DELETE FROM login WHERE id = " + PASS)
 	db.commit()
 	db.close()
+	window.destroy()
 
 window = tk.Tk()
 window.title('BusinessTech')
