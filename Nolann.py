@@ -42,10 +42,10 @@ deroulant_infos.add_command(label="déconnexion",background='red', command=logou
 button_infos.configure(menu=deroulant_infos)
 
 #Background
-background = PhotoImage(file='background.gif', master=window)
+background = PhotoImage(file='Image/background.gif', master=window)
 canvas = tk.Canvas(window, width=1280, height=660, background='blue', bd=0, highlightthickness=0)
 canvas.pack()
 canvas.create_image((1280/2, 660/2), image=background)
-icon = tk.PhotoImage(file='background.gif')
+icon = tk.PhotoImage(file='Image/background.gif')
 window.iconphoto(True, icon)
 window.mainloop()

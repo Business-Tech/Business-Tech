@@ -15,7 +15,7 @@ window = tk.Tk()
 window.title('BusinessTech')
 window.geometry('230x70')
 window.resizable(width=False, height=False)
-icon = tk.PhotoImage(file='bt.gif')
+icon = tk.PhotoImage(file='Image/bt.gif')
 window.iconphoto(True, icon)
 
 ID = StringVar()

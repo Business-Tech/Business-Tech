@@ -9,22 +9,22 @@ def verif():
 	passw = MDP.get()
 	db = sqlite3.connect('database.db')
 	cursor = db.cursor()
-	cursor.execute('SELECT id, mdp FROM login')
+	cursor.execute('SELECT * FROM login')
 	user_list = cursor.fetchall()
-	print(user_list)
 	for i in user_list:
 		if ident in i:
 			if passw in i:
 				window.destroy()
 				os.system("python Nolann.py")
 		else:
-			pass
+			print('ERROR : Login or Password')
+			print('Try Again')
 
 window = tk.Tk()
 window.title('BusinessTech')
 window.geometry('1280x720')
 window.resizable(width=False, height=False)
-icon = tk.PhotoImage(file='bt.gif')
+icon = tk.PhotoImage(file='Image/bt.gif')
 window.iconphoto(True, icon)
 
 frame = Frame(window, bg='#013D6B', padx=540, pady=300)
@@ -45,7 +45,7 @@ MDP.set('Mot de Passe')
 entry_MDP = Entry(frame, textvariable=MDP, width=30)
 entry_MDP.pack()
 
-Button = Button(frame, text='Login', command=verif)
+Button = Button(frame, text='LOGIN', command=verif)
 Button.pack(pady=10)
 
 frame.pack()
