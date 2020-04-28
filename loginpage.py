@@ -16,16 +16,19 @@ def verif():
 			if passw in i:
 				PASS = ("'" + ID.get() + "'")
 				cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+				iid = cursor.fetchone()[0]
+				cursor.execute("SELECT * FROM login WHERE id = " + PASS)
 				first = cursor.fetchone()[1]
 				cursor.execute("SELECT * FROM login WHERE id = " + PASS)
 				last = cursor.fetchone()[2]
 				user = sqlite3.connect('user_database.db')
 				cur = user.cursor()
-				cur.execute('CREATE TABLE IF NOT EXISTS us_er (first_name TEXT, last_name TEXT)')
-				cur.execute('INSERT INTO us_er VALUES (:first_name, :last_name)',
+				cur.execute('CREATE TABLE IF NOT EXISTS us_er (id TEXT, first_name TEXT, last_name TEXT)')
+				cur.execute('INSERT INTO us_er VALUES (:id, :first_name, :last_name)',
 					{
+						'id':''+iid,
 						'first_name':''+first,
-						'last_name':''+last,
+						'last_name':''+last
 					})
 				user.commit()
 				user.close()

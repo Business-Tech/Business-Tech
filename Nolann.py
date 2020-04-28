@@ -43,27 +43,124 @@ def communication():
 	frame_communication.grid()
 	#code here :
 
+	def message():
+		user = sqlite3.connect('user_database.db')
+		cur = user.cursor()
+		cur.execute('SELECT * FROM us_er')
+		current_user = cur.fetchone()[0]
+
+		ID_Dest = entry_Dest.get()
+		IDest = str(ID_Dest)
+
+		db_message = sqlite3.connect('message.db')
+		cursor_message = db_message.cursor()
+		cursor_message.execute('CREATE TABLE IF NOT EXISTS notes (objet TEXT, message TEXT, byy TEXT, too TEXT)')
+		cursor_message.execute('INSERT INTO notes VALUES (:objet, :message, :byy, :too)',
+			{
+				'objet':entry_Obj.get(),
+				'message':entry.get(),
+				'byy':current_user,
+				'too':IDest
+			})
+		db_message.commit()
+		db_message.close()
+		communication()
+	
+	def remove():
+		db_message = sqlite3.connect('message.db')
+		cursor_message = db_message.cursor()
+		cursor_message.execute('DELETE FROM notes')
+		db_message.commit()
+		db_message.close()
+		communication()
+
 	db = sqlite3.connect('database.db')
 	cursor = db.cursor()
-	cursor.execute('SELECT first_name, last_name FROM login')
+	cursor.execute('SELECT id, last_name, first_name FROM login')
+	id_verif = cursor.fetchone()[0]
 	names = cursor.fetchall()
 
+	user = sqlite3.connect('user_database.db')
+	cur = user.cursor()
+	cur.execute('SELECT * FROM us_er')
+	current_user = cur.fetchone()[0]
+
+	db_message = sqlite3.connect('message.db')
+
+	cursor_message = db_message.cursor()
+	cursor_message.execute('CREATE TABLE IF NOT EXISTS notes (objet TEXT, message TEXT, byy TEXT, too TEXT)')
+	cursor_message.execute('SELECT byy FROM notes')
+	byy_verif = cursor_message.fetchall()
+	cursor_message.execute('SELECT too FROM notes')
+	too_verif = cursor_message.fetchall()
+	cursor_message.execute('SELECT * FROM notes')
+	mess = cursor_message.fetchall()
+
+	full_mess_by=''
+	for b in byy_verif:
+		if current_user in b:
+			db_message = sqlite3.connect('message.db')
+			cursor_message = db_message.cursor()
+			VERIF = ("'" + current_user + "'")
+			cursor_message.execute("SELECT * FROM notes WHERE byy = " + VERIF)
+			lock_byy = cursor_message.fetchall()
+			for lb in lock_byy:
+				full_mess += str(lb) + '\n'
+
+	full_mess_to=''
+	for t in too_verif:
+		if current_user in t:
+			db_message = sqlite3.connect('message.db')
+			cursor_message = db_message.cursor()
+			VERIF = ("'" + current_user + "'")
+			cursor_message.execute("SELECT * FROM notes WHERE too = " + VERIF)
+			lock_too = cursor_message.fetchall()
+			for lt in lock_too:
+				full_messs += str(lt) + '\n'
+	
 	full_names=''
 	for n in names:
-		full_names += str(n) + '\n'w
+		full_names += str(n) + '\n'
+
+	lr = Label(frame_communication, bg='#013D6B')
+	lr.grid(column=1, row=1, sticky=W)
+	l1 = Label(frame_communication)
+	l2 = Label(frame_communication)
+	l1.grid(column=0, row=2, sticky=W, ipadx=303, padx=18)
+	l2.grid(column=0, row=3, sticky=W, ipadx=303, padx=18)
 
 	Destinataire = StringVar()
-	Destinataire.set('Destinataire')
-	entry_Dest = Entry(frame_communication, textvariable=Destinataire, width=30, bg='white')
-	entry_Dest.grid(column=1, row=1, sticky=W, ipadx=195, padx=10)
+	Destinataire.set('ID Destinataire')
 	Objet = StringVar()
 	Objet.set('Objet')
+	entry_Dest = Entry(frame_communication, textvariable=Destinataire, width=30, bg='white')
+	entry_Dest.grid(column=1, row=2, sticky=W, ipadx=195, padx=10)
 	entry_Obj = Entry(frame_communication, textvariable=Objet, width=30, bg='white')
-	entry_Obj.grid(column=1, row=2, sticky=W, ipadx=195, padx=10)
-	query_users = Label(frame_communication, text=full_names)
-	query_users.grid(column=0, row=3, sticky=W, ipadx=250, ipady=285, padx=10)
-	query_text = Label(frame_communication)
-	query_text.grid(column=1, row=3, sticky=W, ipadx=300, ipady=310, padx=10)
+	entry_Obj.grid(column=1, row=3, sticky=W, ipadx=195, padx=10)
+
+	frame_users = Frame(frame_communication)
+	frame_users.grid(column=0, row=4, sticky=W, ipadx=304, ipady=260, padx=18, pady=10)
+	frame_users.grid_propagate(0)
+	frame_text = Frame(frame_communication)
+	frame_text.grid(column=1, row=4, sticky=W, ipadx=304, ipady=260, padx=10)
+	frame_text.grid_propagate(0)
+
+
+	query_users = Label(frame_users, text=full_names)
+	query_users.grid()
+	Text = StringVar()
+	Text.set('Say Something')
+	entry = Entry(frame_communication, textvariable=Text, width=30, bg='white')
+	entry.grid(column=1, row=5, sticky=W, ipadx=172, ipady=4, padx=10)
+	Buttonn = Button(frame_communication, text='-->', command=message)
+	Buttonn.grid(column=1, row=5, sticky=W, padx=575)
+	Text_Remove = Label(frame_communication, text='Cliquer sur ce bouton                 pour supprimer la conversation')
+	Text_Remove.grid(column=0, row=5, sticky=W, ipadx=136, ipady=5, padx=18)
+	Buttonn_remove = Button(frame_communication, text='O', command=remove)
+	Buttonn_remove.grid(column=0, row=5, sticky=W, padx=280)
+	full_mess = full_mess_by + full_mess_to
+	query_text = Label(frame_text, text=full_mess)
+	query_text.grid()
 
 def salaire():
 	destroy_window()
