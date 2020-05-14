@@ -1,5 +1,7 @@
 from tkinter import*
 import tkinter as tk
+from tkinter import ttk
+from PIL import Image, ImageTk
 import tkinter.messagebox as tm
 import sqlite3
 import time
@@ -37,6 +39,7 @@ def planning():
 	destroy_window()
 	frame_planning.grid()
 	#code here :
+	
 
 def communication():
 	destroy_window()
@@ -54,10 +57,9 @@ def communication():
 
 		db_message = sqlite3.connect('message.db')
 		cursor_message = db_message.cursor()
-		cursor_message.execute('CREATE TABLE IF NOT EXISTS notes (objet TEXT, message TEXT, byy TEXT, too TEXT)')
-		cursor_message.execute('INSERT INTO notes VALUES (:objet, :message, :byy, :too)',
+		cursor_message.execute('CREATE TABLE IF NOT EXISTS notes (message TEXT, byy TEXT, too TEXT)')
+		cursor_message.execute('INSERT INTO notes VALUES (:message, :byy, :too)',
 			{
-				'objet':entry_Obj.get(),
 				'message':entry.get(),
 				'byy':current_user,
 				'too':IDest
@@ -86,17 +88,14 @@ def communication():
 	current_user = cur.fetchone()[0]
 
 	db_message = sqlite3.connect('message.db')
-
 	cursor_message = db_message.cursor()
-	cursor_message.execute('CREATE TABLE IF NOT EXISTS notes (objet TEXT, message TEXT, byy TEXT, too TEXT)')
+	cursor_message.execute('CREATE TABLE IF NOT EXISTS notes (message TEXT, byy TEXT, too TEXT)')
 	cursor_message.execute('SELECT byy FROM notes')
 	byy_verif = cursor_message.fetchall()
 	cursor_message.execute('SELECT too FROM notes')
 	too_verif = cursor_message.fetchall()
-	cursor_message.execute('SELECT * FROM notes')
-	mess = cursor_message.fetchall()
 
-	full_mess_by=''
+	lock_byy=''
 	for b in byy_verif:
 		if current_user in b:
 			db_message = sqlite3.connect('message.db')
@@ -104,10 +103,8 @@ def communication():
 			VERIF = ("'" + current_user + "'")
 			cursor_message.execute("SELECT * FROM notes WHERE byy = " + VERIF)
 			lock_byy = cursor_message.fetchall()
-			for lb in lock_byy:
-				full_mess += str(lb) + '\n'
 
-	full_mess_to=''
+	lock_too=''
 	for t in too_verif:
 		if current_user in t:
 			db_message = sqlite3.connect('message.db')
@@ -115,52 +112,61 @@ def communication():
 			VERIF = ("'" + current_user + "'")
 			cursor_message.execute("SELECT * FROM notes WHERE too = " + VERIF)
 			lock_too = cursor_message.fetchall()
-			for lt in lock_too:
-				full_messs += str(lt) + '\n'
-	
-	full_names=''
-	for n in names:
-		full_names += str(n) + '\n'
 
-	lr = Label(frame_communication, bg='#013D6B')
-	lr.grid(column=1, row=1, sticky=W)
-	l1 = Label(frame_communication)
-	l2 = Label(frame_communication)
-	l1.grid(column=0, row=2, sticky=W, ipadx=303, padx=18)
-	l2.grid(column=0, row=3, sticky=W, ipadx=303, padx=18)
+	full_mess_by=''
+	for fb in lock_byy:
+		full_mess_by += str(fb) + '\n'
+
+	full_mess_to=''
+	for ft in lock_too:
+		full_mess_to += str(ft) + '\n'
+
+	l1 = Label(frame_communication, bg='#013D6B')
+	l1.grid(column=0, row=1)
+	load = Image.open("Image/message_box.png")
+	render = ImageTk.PhotoImage(load)
+	img = Label(frame_communication, image=render)
+	img.image = render
+	img.grid(column=0, row=2)
 
 	Destinataire = StringVar()
-	Destinataire.set('ID Destinataire')
-	Objet = StringVar()
-	Objet.set('Objet')
-	entry_Dest = Entry(frame_communication, textvariable=Destinataire, width=30, bg='white')
-	entry_Dest.grid(column=1, row=2, sticky=W, ipadx=195, padx=10)
-	entry_Obj = Entry(frame_communication, textvariable=Objet, width=30, bg='white')
-	entry_Obj.grid(column=1, row=3, sticky=W, ipadx=195, padx=10)
+	entry_Dest = Entry(frame_communication, textvariable=Destinataire, width=10, bg='white')
+	entry_Dest.grid(column=1, row=2, sticky=W, ipadx=4, padx=312)
+	print_Dest = Label(frame_communication, text='ID Destinataire :')
+	print_Dest.grid(column=1, row=2, sticky=W, padx=220)
 
 	frame_users = Frame(frame_communication)
-	frame_users.grid(column=0, row=4, sticky=W, ipadx=304, ipady=260, padx=18, pady=10)
+	frame_users.grid(column=0, row=3, sticky=W, ipadx=304, ipady=260, padx=18, pady=15)
 	frame_users.grid_propagate(0)
 	frame_text = Frame(frame_communication)
-	frame_text.grid(column=1, row=4, sticky=W, ipadx=304, ipady=260, padx=10)
+	frame_text.grid(column=1, row=3, sticky=W, ipadx=298, ipady=260, padx=15)
 	frame_text.grid_propagate(0)
 
+	table = ttk.Treeview(frame_users, columns=(1,2,3), show='headings', height=26)
+	table.grid()
+	table.heading(1, text='ID')
+	table.heading(2, text='Nom')
+	table.heading(3, text='Prénom')
+	for n in names:
+		table.insert('', 'end', values=n)
 
-	query_users = Label(frame_users, text=full_names)
-	query_users.grid()
 	Text = StringVar()
 	Text.set('Say Something')
 	entry = Entry(frame_communication, textvariable=Text, width=30, bg='white')
-	entry.grid(column=1, row=5, sticky=W, ipadx=172, ipady=4, padx=10)
+	entry.grid(column=1, row=4, sticky=W, ipadx=172, ipady=4, padx=10)
 	Buttonn = Button(frame_communication, text='-->', command=message)
-	Buttonn.grid(column=1, row=5, sticky=W, padx=575)
+	Buttonn.grid(column=1, row=4, sticky=W, padx=575)
 	Text_Remove = Label(frame_communication, text='Cliquer sur ce bouton                 pour supprimer la conversation')
-	Text_Remove.grid(column=0, row=5, sticky=W, ipadx=136, ipady=5, padx=18)
+	Text_Remove.grid(column=0, row=4, sticky=W, ipadx=136, ipady=5, padx=18)
 	Buttonn_remove = Button(frame_communication, text='O', command=remove)
-	Buttonn_remove.grid(column=0, row=5, sticky=W, padx=280)
+	Buttonn_remove.grid(column=0, row=4, sticky=W, padx=280)
 	full_mess = full_mess_by + full_mess_to
 	query_text = Label(frame_text, text=full_mess)
 	query_text.grid()
+
+	msg_frame = Frame(frame_text)
+	msg_frame.grid(column=1, row=3)
+	
 
 def salaire():
 	destroy_window()
@@ -170,9 +176,9 @@ def salaire():
 user = sqlite3.connect('user_database.db')
 cur = user.cursor()
 cur.execute('SELECT * FROM us_er')
-first_username = cur.fetchone()[0]
+first_username = cur.fetchone()[1]
 cur.execute('SELECT * FROM us_er')
-last_username = cur.fetchone()[1]
+last_username = cur.fetchone()[2]
 user.commit()
 user.close()
 
