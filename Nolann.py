@@ -1,8 +1,10 @@
 from tkinter import*
+from tkcalendar import *
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 import tkinter.messagebox as tm
+from datetime import datetime, timedelta
 import sqlite3
 import time
 import os
@@ -10,6 +12,14 @@ import os
 def logout():
 	user = sqlite3.connect('user_database.db')
 	cur = user.cursor()
+
+	time_logout = time.strftime('%H:%M:%S')
+	datetime_logout = datetime.strptime(time_logout, '%H:%M:%S')
+	datetime_travail = datetime_logout - datetime_login
+	time_travail = str((datetime_travail))
+	cursor_temp.execute('''INSERT INTO temp (pseudo_temp, jour, heure_login, heure_logout, heure_travail)
+	VALUES (?, ?, ?, ?, ?)''',(pseudo, jour_login, time_login, time_logout, time_travail))
+	db_temp.commit()
 	cur.execute('DELETE FROM us_er')
 	user.commit()
 	user.close()
@@ -40,6 +50,56 @@ def planning():
 	frame_planning.grid()
 	#code here :
 	
+	def is_pressed():
+		planning_db = sqlite3.connect('planning.db')
+		c_planning = planning_db.cursor()
+		c_planning.execute('CREATE TABLE IF NOT EXISTS t_plan (date TEXT, tache TEXT)')
+		c_planning.execute('INSERT INTO t_plan VALUES (:date, :tache)',
+			{
+				'date':calendar.get_date(),
+				'tache':entry_taches.get()
+			})
+		planning_db.commit()
+		planning_db.close()
+		planning()
+
+	left_frame = Frame(frame_planning)
+	right_frame = Frame(frame_planning, bg='#4d4d4d')
+	left_frame.grid(column=0, row=1, sticky=W, padx=15, pady=10)
+	right_frame.grid(column=1, row=1, sticky=W, padx=10)
+
+	calendar = Calendar(left_frame, selectmode='day', year=2020, month=5, day=24)
+	calendar.grid(ipadx=300, ipady=240)
+	bt_get_date = Button(right_frame, command=is_pressed, bg='#4d4d4d', highlightthickness=0, bd=0)
+	bt_get_date.grid(row=4, ipadx=100)
+
+	planning_db = sqlite3.connect('planning.db')
+	c_planning = planning_db.cursor()
+	c_planning.execute('SELECT * FROM t_plan')
+	date_db = c_planning.fetchall()
+	date=''
+	for d in date_db:
+		date += str(d) + '\n'
+
+	frame_taches = Frame(right_frame, bg="white")
+	frame_taches.grid(row=3, ipadx=180, ipady=200)
+	frame_taches.grid_propagate(0)
+
+	info = Label(right_frame, text='Tâches', bg='#4d4d4d', fg='white')
+	info.grid(row=2, pady=6)
+	taches = Label(frame_taches, text=date)
+	taches.grid()
+	var = StringVar()
+	entry_taches = Entry(right_frame, textvariable=var)
+	entry_taches.grid(row=4, pady=6)
+
+	frame_EDT = Frame(right_frame, bg='white')
+	frame_EDT.grid(row=0, ipadx=181, ipady=50)
+	frame_EDT.grid_propagate(0)
+	EDT = Label(frame_EDT, text='Lundi        -->' + '\n' + 'Mardi        -->' + '\n' + 'Mercredi  -->' + '\n' + 'Jeudi        -->' + '\n' + 'Vendredi  -->' + '\n' + 'Samedi     -->' + '\n' + 'Dimanche -->', bg='white')
+	EDT.grid()
+	space = Label(right_frame, bg='#013D6B')
+	space.grid(row=1, ipadx=180)
 
 def communication():
 	destroy_window()
@@ -74,6 +134,12 @@ def communication():
 		cursor_message.execute('DELETE FROM notes')
 		db_message.commit()
 		db_message.close()
+
+		planning_db = sqlite3.connect('planning.db')
+		c_planning = planning_db.cursor()
+		c_planning.execute('DELETE FROM t_plan')
+		planning_db.commit()
+		planning_db.close()
 		communication()
 
 	db = sqlite3.connect('database.db')
@@ -171,7 +237,70 @@ def communication():
 def salaire():
 	destroy_window()
 	frame_salaire.grid()
+	frame_horloge=Frame(frame_salaire, bg='snow')
 	#code here :
+
+	def tick():
+		#recupere l'heure local
+		time1 = time.strftime('%H:%M:%S')
+		clock.config(text=time1)
+		clock.after(200, tick)
+
+	def temp_login():
+		time_salaire = time.strftime('%H:%M:%S')
+		datetime_salaire = datetime.strptime(time_salaire,"%H:%M:%S")
+		clock2.config(text=datetime_salaire-datetime_login)
+		clock2.after(200, temp_login)
+		
+	texte_horloge = Label(frame_horloge, text="Heure Actuelle")
+	texte_horloge.pack()
+	clock = Label(frame_horloge, font=('times', 20, 'bold'))
+	clock.pack(fill=BOTH, expand=1)
+	tick()
+	frame_horloge.grid(pady=10)
+
+	frame_restant=Frame(frame_salaire, bg ='snow')
+	texte_restant = Label(frame_restant, text="Temp de connexion")
+	texte_restant.pack()
+	clock2 = Label(frame_restant, font=('times', 20, 'bold'))
+	clock2.pack(fill=BOTH, expand=1)
+	temp_login()
+	frame_restant.grid()
+
+	cursor_temp.execute('''SELECT jour, heure_login, heure_logout, heure_travail FROM temp WHERE pseudo_temp = ? ''',(pseudo,))
+	info_connexion = cursor_temp.fetchall()
+	print(info_connexion)
+
+	frame_users = Frame(frame_salaire)
+	frame_users.grid(column=0, row=4, sticky=W, ipadx=400, ipady=160, padx=18, pady=15)
+	frame_users.grid_propagate(0)
+
+	table = ttk.Treeview(frame_users, columns=(1,2,3,4), show='headings', height=26)
+	table.grid()
+	table.heading(1, text='Jour')
+	table.heading(2, text='Heure de connexion')
+	table.heading(3, text='Heure de déconnexion')
+	table.heading(4, text='Temp de travail')
+	for n in info_connexion:
+		table.insert('', 'end', values=n)
+
+	#cursor_temp.execute('''SELECT * FROM temp WHERE pseudo_temp = ? ''',(pseudo,))
+	#total_heure =  cursor_temp.fetchone()[2]
+	#total_heure = str(total_heure)
+	#for x in total_heure:
+		#datetime_total = datetime.strptime(x, '%H:%M:%S')
+		#print(datetime_total)
+	#frame_total = Frame(frame_salaire)
+	#text = Label(frame_total,"Heures Totales : ")
+	#frame_total.grid()
+
+#recupere l'heure de connexion
+time_login = time.strftime('%H:%M:%S')
+datetime_login = datetime.strptime(time_login, "%H:%M:%S")
+jour_login = time.strftime('%d/%m/%y')
+db_temp = sqlite3.connect('database_login3.db')
+cursor_temp = db_temp.cursor()
+cursor_temp.execute('CREATE TABLE IF NOT EXISTS temp (pseudo_temp TEXT, jour TEXT, heure_login TEXT, heure_logout TEXT, heure_travail TEXT)')
 
 user = sqlite3.connect('user_database.db')
 cur = user.cursor()
@@ -179,6 +308,8 @@ cur.execute('SELECT * FROM us_er')
 first_username = cur.fetchone()[1]
 cur.execute('SELECT * FROM us_er')
 last_username = cur.fetchone()[2]
+cur.execute('SELECT * FROM us_er')
+pseudo = cur.fetchone()[0]
 user.commit()
 user.close()
 
