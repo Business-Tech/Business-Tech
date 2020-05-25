@@ -49,7 +49,7 @@ def planning():
 	destroy_window()
 	frame_planning.grid()
 	#code here :
-	
+
 	def is_pressed():
 		planning_db = sqlite3.connect('planning.db')
 		c_planning = planning_db.cursor()
@@ -85,6 +85,15 @@ def planning():
 	frame_taches.grid(row=3, ipadx=180, ipady=200)
 	frame_taches.grid_propagate(0)
 
+	user = sqlite3.connect('user_database.db')
+	cur = user.cursor()
+	cur.execute('SELECT * FROM us_er')
+	current_user = cur.fetchone()[0]
+	horaires = sqlite3.connect('horaires.db')
+	c_horaires = horaires.cursor()
+	c_horaires.execute('SELECT * FROM t_hor')
+	act_user = c_horaires.fetchone()[0]
+
 	info = Label(right_frame, text='Tâches', bg='#4d4d4d', fg='white')
 	info.grid(row=2, pady=6)
 	taches = Label(frame_taches, text=date)
@@ -93,10 +102,26 @@ def planning():
 	entry_taches = Entry(right_frame, textvariable=var)
 	entry_taches.grid(row=4, pady=6)
 
+	VERIF = ("'" + current_user + "'")
+	c_horaires.execute("SELECT lundi FROM t_hor WHERE user = " + VERIF)
+	Lundi = c_horaires.fetchall()
+	c_horaires.execute("SELECT mardi FROM t_hor WHERE user = " + VERIF)
+	Mardi = c_horaires.fetchall()
+	c_horaires.execute("SELECT mercredi FROM t_hor WHERE user = " + VERIF)
+	Mercredi = c_horaires.fetchall()
+	c_horaires.execute("SELECT jeudi FROM t_hor WHERE user = " + VERIF)
+	Jeudi = c_horaires.fetchall()
+	c_horaires.execute("SELECT vendredi FROM t_hor WHERE user = " + VERIF)
+	Vendredi = c_horaires.fetchall()
+	c_horaires.execute("SELECT samedi FROM t_hor WHERE user = " + VERIF)
+	Samedi = c_horaires.fetchall()
+	c_horaires.execute("SELECT dimanche FROM t_hor WHERE user = " + VERIF)
+	Dimanche = c_horaires.fetchall()
+
 	frame_EDT = Frame(right_frame, bg='white')
 	frame_EDT.grid(row=0, ipadx=181, ipady=50)
 	frame_EDT.grid_propagate(0)
-	EDT = Label(frame_EDT, text='Lundi        -->' + '\n' + 'Mardi        -->' + '\n' + 'Mercredi  -->' + '\n' + 'Jeudi        -->' + '\n' + 'Vendredi  -->' + '\n' + 'Samedi     -->' + '\n' + 'Dimanche -->', bg='white')
+	EDT = Label(frame_EDT, text='Lundi        -->    ' + str(Lundi) + '\n' + 'Mardi        -->    ' + str(Mardi) + '\n' + 'Mercredi  -->    ' + str(Mercredi) + '\n' + 'Jeudi        -->    ' + str(Jeudi) + '\n' + 'Vendredi  -->    ' + str(Vendredi) + '\n' + 'Samedi     -->    ' + str(Samedi) + '\n' + 'Dimanche -->    ' + str(Dimanche), bg='white')
 	EDT.grid()
 	space = Label(right_frame, bg='#013D6B')
 	space.grid(row=1, ipadx=180)
@@ -140,6 +165,12 @@ def communication():
 		c_planning.execute('DELETE FROM t_plan')
 		planning_db.commit()
 		planning_db.close()
+
+		horaires = sqlite3.connect('horaires.db')
+		c_horaires = horaires.cursor()
+		c_horaires.execute('DELETE FROM t_hor')
+		horaires.commit()
+		horaires.close()
 		communication()
 
 	db = sqlite3.connect('database.db')
@@ -288,8 +319,8 @@ def salaire():
 	#total_heure =  cursor_temp.fetchone()[2]
 	#total_heure = str(total_heure)
 	#for x in total_heure:
-		#datetime_total = datetime.strptime(x, '%H:%M:%S')
-		#print(datetime_total)
+	#datetime_total = datetime.strptime(x, '%H:%M:%S')
+	#print(datetime_total)
 	#frame_total = Frame(frame_salaire)
 	#text = Label(frame_total,"Heures Totales : ")
 	#frame_total.grid()
