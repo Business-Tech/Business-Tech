@@ -53,9 +53,10 @@ def planning():
 	def is_pressed():
 		planning_db = sqlite3.connect('planning.db')
 		c_planning = planning_db.cursor()
-		c_planning.execute('CREATE TABLE IF NOT EXISTS t_plan (date TEXT, tache TEXT)')
-		c_planning.execute('INSERT INTO t_plan VALUES (:date, :tache)',
+		c_planning.execute('CREATE TABLE IF NOT EXISTS t_plan (user TEXT, date TEXT, tache TEXT)')
+		c_planning.execute('INSERT INTO t_plan VALUES (:user, :date, :tache)',
 			{
+				'user':current_user,
 				'date':calendar.get_date(),
 				'tache':entry_taches.get()
 			})
@@ -67,40 +68,44 @@ def planning():
 	right_frame = Frame(frame_planning, bg='#4d4d4d')
 	left_frame.grid(column=0, row=1, sticky=W, padx=15, pady=10)
 	right_frame.grid(column=1, row=1, sticky=W, padx=10)
-
-	calendar = Calendar(left_frame, selectmode='day', year=2020, month=5, day=24)
-	calendar.grid(ipadx=300, ipady=240)
-	bt_get_date = Button(right_frame, command=is_pressed, bg='#4d4d4d', highlightthickness=0, bd=0)
-	bt_get_date.grid(row=4, ipadx=100)
-
-	planning_db = sqlite3.connect('planning.db')
-	c_planning = planning_db.cursor()
-	c_planning.execute('SELECT * FROM t_plan')
-	date_db = c_planning.fetchall()
-	date=''
-	for d in date_db:
-		date += str(d) + '\n'
-
 	frame_taches = Frame(right_frame, bg="white")
-	frame_taches.grid(row=3, ipadx=180, ipady=200)
+	frame_taches.grid(row=4, ipadx=180, ipady=220)
 	frame_taches.grid_propagate(0)
 
 	user = sqlite3.connect('user_database.db')
 	cur = user.cursor()
 	cur.execute('SELECT * FROM us_er')
 	current_user = cur.fetchone()[0]
+
+	calendar = Calendar(left_frame, selectmode='day', year=2020, month=5, day=24)
+	calendar.grid(ipadx=300, ipady=240)
+	bt_get_date = Button(right_frame, command=is_pressed, bg='#4d4d4d', highlightthickness=0, bd=0)
+	bt_get_date.grid(row=5, ipadx=165)
+
+	planning_db = sqlite3.connect('planning.db')
+	c_planning = planning_db.cursor()
+	TT = ("'" + current_user + "'")
+	c_planning.execute("SELECT date, tache FROM t_plan WHERE user =" + TT)
+	date_db = c_planning.fetchall()
+	
+	date=''
+	for d in date_db:
+		date += str(d) + '\n'
+
 	horaires = sqlite3.connect('horaires.db')
 	c_horaires = horaires.cursor()
 	c_horaires.execute('SELECT * FROM t_hor')
 	act_user = c_horaires.fetchone()[0]
 
 	info = Label(right_frame, text='Tâches', bg='#4d4d4d', fg='white')
-	info.grid(row=2, pady=6)
+	info.grid(row=3, pady=2)
+	info2 = Label(right_frame, text='EDT', bg='#4d4d4d', fg='white')
+	info2.grid(row=0, pady=2)
 	taches = Label(frame_taches, text=date)
 	taches.grid()
 	var = StringVar()
 	entry_taches = Entry(right_frame, textvariable=var)
-	entry_taches.grid(row=4, pady=6)
+	entry_taches.grid(row=5, ipadx=80, pady=6)
 
 	VERIF = ("'" + current_user + "'")
 	c_horaires.execute("SELECT lundi FROM t_hor WHERE user = " + VERIF)
@@ -119,12 +124,12 @@ def planning():
 	Dimanche = c_horaires.fetchall()
 
 	frame_EDT = Frame(right_frame, bg='white')
-	frame_EDT.grid(row=0, ipadx=181, ipady=50)
+	frame_EDT.grid(row=1, ipadx=181, ipady=50)
 	frame_EDT.grid_propagate(0)
 	EDT = Label(frame_EDT, text='Lundi        -->    ' + str(Lundi) + '\n' + 'Mardi        -->    ' + str(Mardi) + '\n' + 'Mercredi  -->    ' + str(Mercredi) + '\n' + 'Jeudi        -->    ' + str(Jeudi) + '\n' + 'Vendredi  -->    ' + str(Vendredi) + '\n' + 'Samedi     -->    ' + str(Samedi) + '\n' + 'Dimanche -->    ' + str(Dimanche), bg='white')
 	EDT.grid()
 	space = Label(right_frame, bg='#013D6B')
-	space.grid(row=1, ipadx=180)
+	space.grid(row=2, ipadx=180)
 
 def communication():
 	destroy_window()
@@ -165,12 +170,6 @@ def communication():
 		c_planning.execute('DELETE FROM t_plan')
 		planning_db.commit()
 		planning_db.close()
-
-		horaires = sqlite3.connect('horaires.db')
-		c_horaires = horaires.cursor()
-		c_horaires.execute('DELETE FROM t_hor')
-		horaires.commit()
-		horaires.close()
 		communication()
 
 	db = sqlite3.connect('database.db')
@@ -218,52 +217,41 @@ def communication():
 	for ft in lock_too:
 		full_mess_to += str(ft) + '\n'
 
-	l1 = Label(frame_communication, bg='#013D6B')
-	l1.grid(column=0, row=1)
-	load = Image.open("Image/message_box.png")
-	render = ImageTk.PhotoImage(load)
-	img = Label(frame_communication, image=render)
-	img.image = render
-	img.grid(column=0, row=2)
+	frame_users = Frame(frame_communication, bg='#4d4d4d')
+	frame_text = Frame(frame_communication, bg='#4d4d4d')
+	frame_users.grid(column=0, row=0, sticky=W, padx=15, pady=10)
+	frame_text.grid(column=1, row=0, sticky=W, padx=10)
+	frame_label_text = Frame(frame_text, bg='white')
+	frame_label_text.grid(row=1, sticky=W, ipadx=290, ipady=291)
+	frame_label_text.grid_propagate(0)
 
 	Destinataire = StringVar()
-	entry_Dest = Entry(frame_communication, textvariable=Destinataire, width=10, bg='white')
-	entry_Dest.grid(column=1, row=2, sticky=W, ipadx=4, padx=312)
-	print_Dest = Label(frame_communication, text='ID Destinataire :')
-	print_Dest.grid(column=1, row=2, sticky=W, padx=220)
-
-	frame_users = Frame(frame_communication)
-	frame_users.grid(column=0, row=3, sticky=W, ipadx=304, ipady=260, padx=18, pady=15)
-	frame_users.grid_propagate(0)
-	frame_text = Frame(frame_communication)
-	frame_text.grid(column=1, row=3, sticky=W, ipadx=298, ipady=260, padx=15)
-	frame_text.grid_propagate(0)
+	entry_Dest = Entry(frame_text, textvariable=Destinataire, width=10, bg='white')
+	entry_Dest.grid(row=0, sticky=W, ipadx=4, padx=248)
+	print_Dest = Label(frame_text, text='ID -->')
+	print_Dest.grid(row=0, sticky=W, padx=213, pady=2)
 
 	table = ttk.Treeview(frame_users, columns=(1,2,3), show='headings', height=26)
-	table.grid()
+	table.grid(row=1, ipady=25)
 	table.heading(1, text='ID')
 	table.heading(2, text='Nom')
 	table.heading(3, text='Prénom')
 	for n in names:
 		table.insert('', 'end', values=n)
 
+	news = Label(frame_users, text='Tableau des Utilisateurs', bg='#4d4d4d', fg='white')
+	news.grid(row=0, pady=2)
+	Buttonn = Button(frame_text, command=message, bg='#4d4d4d', highlightthickness=0, bd=0)
+	Buttonn.grid(row=2, ipadx=250, ipady=2, pady=4)
 	Text = StringVar()
 	Text.set('Say Something')
-	entry = Entry(frame_communication, textvariable=Text, width=30, bg='white')
-	entry.grid(column=1, row=4, sticky=W, ipadx=172, ipady=4, padx=10)
-	Buttonn = Button(frame_communication, text='-->', command=message)
-	Buttonn.grid(column=1, row=4, sticky=W, padx=575)
-	Text_Remove = Label(frame_communication, text='Cliquer sur ce bouton                 pour supprimer la conversation')
-	Text_Remove.grid(column=0, row=4, sticky=W, ipadx=136, ipady=5, padx=18)
-	Buttonn_remove = Button(frame_communication, text='O', command=remove)
-	Buttonn_remove.grid(column=0, row=4, sticky=W, padx=280)
+	entry = Entry(frame_text, textvariable=Text, width=30, bg='white')
+	entry.grid(row=2, ipadx=120, ipady=1)
+	Buttonn_remove = Button(frame_users, text='Cliquer ici pour supprimer la conversation', command=remove, bg='#4d4d4d', fg='white', highlightthickness=0, bd=0)
+	Buttonn_remove.grid(row=2, ipadx=100, pady=4)
 	full_mess = full_mess_by + full_mess_to
-	query_text = Label(frame_text, text=full_mess)
-	query_text.grid()
-
-	msg_frame = Frame(frame_text)
-	msg_frame.grid(column=1, row=3)
-	
+	query_text = Label(frame_label_text, text=full_mess)
+	query_text.grid(sticky=W)
 
 def salaire():
 	destroy_window()
