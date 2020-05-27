@@ -4,7 +4,7 @@ import tkinter.messagebox as tm
 import sqlite3
 
 def remove_user():
-	db = sqlite3.connect('database.db')
+	db = sqlite3.connect('Database/database.db')
 	cursor = db.cursor()
 	PASS = ("'" + ID.get() + "'")
 	cursor.execute("DELETE FROM login WHERE id = " + PASS)

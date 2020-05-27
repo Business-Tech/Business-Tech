@@ -10,7 +10,7 @@ import time
 import os
 
 def logout():
-	user = sqlite3.connect('user_database.db')
+	user = sqlite3.connect('Database/user_database.db')
 	cur = user.cursor()
 
 	time_logout = time.strftime('%H:%M:%S')
@@ -51,7 +51,7 @@ def planning():
 	#code here :
 
 	def is_pressed():
-		planning_db = sqlite3.connect('planning.db')
+		planning_db = sqlite3.connect('Database/planning.db')
 		c_planning = planning_db.cursor()
 		c_planning.execute('CREATE TABLE IF NOT EXISTS t_plan (user TEXT, date TEXT, tache TEXT)')
 		c_planning.execute('INSERT INTO t_plan VALUES (:user, :date, :tache)',
@@ -72,7 +72,7 @@ def planning():
 	frame_taches.grid(row=4, ipadx=180, ipady=220)
 	frame_taches.grid_propagate(0)
 
-	user = sqlite3.connect('user_database.db')
+	user = sqlite3.connect('Database/user_database.db')
 	cur = user.cursor()
 	cur.execute('SELECT * FROM us_er')
 	current_user = cur.fetchone()[0]
@@ -82,7 +82,7 @@ def planning():
 	bt_get_date = Button(right_frame, command=is_pressed, bg='#4d4d4d', highlightthickness=0, bd=0)
 	bt_get_date.grid(row=5, ipadx=165)
 
-	planning_db = sqlite3.connect('planning.db')
+	planning_db = sqlite3.connect('Database/planning.db')
 	c_planning = planning_db.cursor()
 	TT = ("'" + current_user + "'")
 	c_planning.execute("SELECT date, tache FROM t_plan WHERE user =" + TT)
@@ -90,9 +90,14 @@ def planning():
 	
 	date=''
 	for d in date_db:
-		date += str(d) + '\n'
+		origin = str(d)
+		rm_comma = origin.replace(",", " : ")
+		rm_quotes = rm_comma.replace("'", "")
+		rm_par1 = rm_quotes.replace("(", "Pour le ")
+		rm_par2 = rm_par1.replace(")", "")
+		date += rm_par2 + '\n'
 
-	horaires = sqlite3.connect('horaires.db')
+	horaires = sqlite3.connect('Database/horaires.db')
 	c_horaires = horaires.cursor()
 	c_horaires.execute('SELECT * FROM t_hor')
 	act_user = c_horaires.fetchone()[0]
@@ -101,32 +106,82 @@ def planning():
 	info.grid(row=3, pady=2)
 	info2 = Label(right_frame, text='EDT', bg='#4d4d4d', fg='white')
 	info2.grid(row=0, pady=2)
-	taches = Label(frame_taches, text=date)
+	taches = Label(frame_taches, text=date, bg='white')
 	taches.grid()
 	var = StringVar()
 	entry_taches = Entry(right_frame, textvariable=var)
 	entry_taches.grid(row=5, ipadx=80, pady=6)
 
 	VERIF = ("'" + current_user + "'")
-	c_horaires.execute("SELECT lundi FROM t_hor WHERE user = " + VERIF)
+	c_horaires.execute("SELECT lundi, lundi0 FROM t_hor WHERE user = " + VERIF)
 	Lundi = c_horaires.fetchall()
-	c_horaires.execute("SELECT mardi FROM t_hor WHERE user = " + VERIF)
+	c_horaires.execute("SELECT mardi, mardi0 FROM t_hor WHERE user = " + VERIF)
 	Mardi = c_horaires.fetchall()
-	c_horaires.execute("SELECT mercredi FROM t_hor WHERE user = " + VERIF)
+	c_horaires.execute("SELECT mercredi, mercredi0 FROM t_hor WHERE user = " + VERIF)
 	Mercredi = c_horaires.fetchall()
-	c_horaires.execute("SELECT jeudi FROM t_hor WHERE user = " + VERIF)
+	c_horaires.execute("SELECT jeudi, jeudi0 FROM t_hor WHERE user = " + VERIF)
 	Jeudi = c_horaires.fetchall()
-	c_horaires.execute("SELECT vendredi FROM t_hor WHERE user = " + VERIF)
+	c_horaires.execute("SELECT vendredi, vendredi0 FROM t_hor WHERE user = " + VERIF)
 	Vendredi = c_horaires.fetchall()
-	c_horaires.execute("SELECT samedi FROM t_hor WHERE user = " + VERIF)
+	c_horaires.execute("SELECT samedi, samedi0 FROM t_hor WHERE user = " + VERIF)
 	Samedi = c_horaires.fetchall()
-	c_horaires.execute("SELECT dimanche FROM t_hor WHERE user = " + VERIF)
+	c_horaires.execute("SELECT dimanche, dimanche0 FROM t_hor WHERE user = " + VERIF)
 	Dimanche = c_horaires.fetchall()
+
+	lundi = str(Lundi)
+	lundi_comma = lundi.replace(",", " /")
+	lundi_quotes = lundi_comma.replace("'", "")
+	lundi_par1 = lundi_quotes.replace("(", "")
+	lundi_par2 = lundi_par1.replace(")", "")
+	lundi_ac1 = lundi_par2.replace("[", "")
+	lundi_ac2 = lundi_ac1.replace("]", "")
+	mardi = str(Mardi)
+	mardi_comma = mardi.replace(",", " /")
+	mardi_quotes = mardi_comma.replace("'", "")
+	mardi_par1 = mardi_quotes.replace("(", "")
+	mardi_par2 = mardi_par1.replace(")", "")
+	mardi_ac1 = mardi_par2.replace("[", "")
+	mardi_ac2 = mardi_ac1.replace("]", "")
+	mercredi = str(Mercredi)
+	mercredi_comma = mercredi.replace(",", " /")
+	mercredi_quotes = mercredi_comma.replace("'", "")
+	mercredi_par1 = mercredi_quotes.replace("(", "")
+	mercredi_par2 = mercredi_par1.replace(")", "")
+	mercredi_ac1 = mercredi_par2.replace("[", "")
+	mercredi_ac2 = mercredi_ac1.replace("]", "")
+	jeudi = str(Jeudi)
+	jeudi_comma = jeudi.replace(",", " /")
+	jeudi_quotes = jeudi_comma.replace("'", "")
+	jeudi_par1 = jeudi_quotes.replace("(", "")
+	jeudi_par2 = jeudi_par1.replace(")", "")
+	jeudi_ac1 = jeudi_par2.replace("[", "")
+	jeudi_ac2 = jeudi_ac1.replace("]", "")
+	vendredi = str(Vendredi)
+	vendredi_comma = vendredi.replace(",", " /")
+	vendredi_quotes = vendredi_comma.replace("'", "")
+	vendredi_par1 = vendredi_quotes.replace("(", "")
+	vendredi_par2 = vendredi_par1.replace(")", "")
+	vendredi_ac1 = vendredi_par2.replace("[", "")
+	vendredi_ac2 = vendredi_ac1.replace("]", "")
+	samedi = str(Samedi)
+	samedi_comma = samedi.replace(",", " /")
+	samedi_quotes = samedi_comma.replace("'", "")
+	samedi_par1 = samedi_quotes.replace("(", "")
+	samedi_par2 = samedi_par1.replace(")", "")
+	samedi_ac1 = samedi_par2.replace("[", "")
+	samedi_ac2 = samedi_ac1.replace("]", "")
+	dimanche = str(Dimanche)
+	dimanche_comma = dimanche.replace(",", " /")
+	dimanche_quotes = dimanche_comma.replace("'", "")
+	dimanche_par1 = dimanche_quotes.replace("(", "")
+	dimanche_par2 = dimanche_par1.replace(")", "")
+	dimanche_ac1 = dimanche_par2.replace("[", "")
+	dimanche_ac2 = dimanche_ac1.replace("]", "")
 
 	frame_EDT = Frame(right_frame, bg='white')
 	frame_EDT.grid(row=1, ipadx=181, ipady=50)
 	frame_EDT.grid_propagate(0)
-	EDT = Label(frame_EDT, text='Lundi        -->    ' + str(Lundi) + '\n' + 'Mardi        -->    ' + str(Mardi) + '\n' + 'Mercredi  -->    ' + str(Mercredi) + '\n' + 'Jeudi        -->    ' + str(Jeudi) + '\n' + 'Vendredi  -->    ' + str(Vendredi) + '\n' + 'Samedi     -->    ' + str(Samedi) + '\n' + 'Dimanche -->    ' + str(Dimanche), bg='white')
+	EDT = Label(frame_EDT, text='Lundi        -->    ' + lundi_ac2 + '\n' + 'Mardi        -->    ' + mardi_ac2 + '\n' + 'Mercredi  -->    ' + mercredi_ac2 + '\n' + 'Jeudi        -->    ' + jeudi_ac2 + '\n' + 'Vendredi  -->    ' + vendredi_ac2 + '\n' + 'Samedi     -->    ' + samedi_ac2 + '\n' + 'Dimanche -->    ' + dimanche_ac2, bg='white')
 	EDT.grid()
 	space = Label(right_frame, bg='#013D6B')
 	space.grid(row=2, ipadx=180)
@@ -137,7 +192,7 @@ def communication():
 	#code here :
 
 	def message():
-		user = sqlite3.connect('user_database.db')
+		user = sqlite3.connect('Database/user_database.db')
 		cur = user.cursor()
 		cur.execute('SELECT * FROM us_er')
 		current_user = cur.fetchone()[0]
@@ -145,7 +200,7 @@ def communication():
 		ID_Dest = entry_Dest.get()
 		IDest = str(ID_Dest)
 
-		db_message = sqlite3.connect('message.db')
+		db_message = sqlite3.connect('Database/message.db')
 		cursor_message = db_message.cursor()
 		cursor_message.execute('CREATE TABLE IF NOT EXISTS notes (message TEXT, byy TEXT, too TEXT)')
 		cursor_message.execute('INSERT INTO notes VALUES (:message, :byy, :too)',
@@ -159,31 +214,39 @@ def communication():
 		communication()
 	
 	def remove():
-		db_message = sqlite3.connect('message.db')
+		RM = ("'" + current_user + "'")
+
+		db_message = sqlite3.connect('Database/message.db')
 		cursor_message = db_message.cursor()
-		cursor_message.execute('DELETE FROM notes')
+		cursor_message.execute('DELETE FROM notes WHERE byy =' + RM)
 		db_message.commit()
 		db_message.close()
 
-		planning_db = sqlite3.connect('planning.db')
+		db_message = sqlite3.connect('Database/message.db')
+		cursor_message = db_message.cursor()
+		cursor_message.execute('DELETE FROM notes WHERE too =' + RM)
+		db_message.commit()
+		db_message.close()
+
+		planning_db = sqlite3.connect('Database/planning.db')
 		c_planning = planning_db.cursor()
-		c_planning.execute('DELETE FROM t_plan')
+		c_planning.execute('DELETE FROM t_plan WHERE user =' + RM)
 		planning_db.commit()
 		planning_db.close()
 		communication()
 
-	db = sqlite3.connect('database.db')
+	db = sqlite3.connect('Database/database.db')
 	cursor = db.cursor()
 	cursor.execute('SELECT id, last_name, first_name FROM login')
 	id_verif = cursor.fetchone()[0]
 	names = cursor.fetchall()
 
-	user = sqlite3.connect('user_database.db')
+	user = sqlite3.connect('Database/user_database.db')
 	cur = user.cursor()
 	cur.execute('SELECT * FROM us_er')
 	current_user = cur.fetchone()[0]
 
-	db_message = sqlite3.connect('message.db')
+	db_message = sqlite3.connect('Database/message.db')
 	cursor_message = db_message.cursor()
 	cursor_message.execute('CREATE TABLE IF NOT EXISTS notes (message TEXT, byy TEXT, too TEXT)')
 	cursor_message.execute('SELECT byy FROM notes')
@@ -194,7 +257,7 @@ def communication():
 	lock_byy=''
 	for b in byy_verif:
 		if current_user in b:
-			db_message = sqlite3.connect('message.db')
+			db_message = sqlite3.connect('Database/message.db')
 			cursor_message = db_message.cursor()
 			VERIF = ("'" + current_user + "'")
 			cursor_message.execute("SELECT * FROM notes WHERE byy = " + VERIF)
@@ -203,7 +266,7 @@ def communication():
 	lock_too=''
 	for t in too_verif:
 		if current_user in t:
-			db_message = sqlite3.connect('message.db')
+			db_message = sqlite3.connect('Database/message.db')
 			cursor_message = db_message.cursor()
 			VERIF = ("'" + current_user + "'")
 			cursor_message.execute("SELECT * FROM notes WHERE too = " + VERIF)
@@ -211,11 +274,21 @@ def communication():
 
 	full_mess_by=''
 	for fb in lock_byy:
-		full_mess_by += str(fb) + '\n'
+		origin = str(fb)
+		rm_comma = origin.replace(",", " >>")
+		rm_quotes = rm_comma.replace("'", "")
+		rm_par1 = rm_quotes.replace("(", "Message : ")
+		rm_par2 = rm_par1.replace(")", "")
+		full_mess_by += rm_par2 + '\n'
 
 	full_mess_to=''
 	for ft in lock_too:
-		full_mess_to += str(ft) + '\n'
+		origin = str(ft)
+		rm_comma = origin.replace(",", " >>")
+		rm_quotes = rm_comma.replace("'", "")
+		rm_par1 = rm_quotes.replace("(", "Message : ")
+		rm_par2 = rm_par1.replace(")", "")
+		full_mess_to += rm_par2 + '\n'
 
 	frame_users = Frame(frame_communication, bg='#4d4d4d')
 	frame_text = Frame(frame_communication, bg='#4d4d4d')
@@ -250,7 +323,7 @@ def communication():
 	Buttonn_remove = Button(frame_users, text='Cliquer ici pour supprimer la conversation', command=remove, bg='#4d4d4d', fg='white', highlightthickness=0, bd=0)
 	Buttonn_remove.grid(row=2, ipadx=100, pady=4)
 	full_mess = full_mess_by + full_mess_to
-	query_text = Label(frame_label_text, text=full_mess)
+	query_text = Label(frame_label_text, text=full_mess, bg='white')
 	query_text.grid(sticky=W)
 
 def salaire():
@@ -260,7 +333,6 @@ def salaire():
 	#code here :
 
 	def tick():
-		#recupere l'heure local
 		time1 = time.strftime('%H:%M:%S')
 		clock.config(text=time1)
 		clock.after(200, tick)
@@ -288,7 +360,6 @@ def salaire():
 
 	cursor_temp.execute('''SELECT jour, heure_login, heure_logout, heure_travail FROM temp WHERE pseudo_temp = ? ''',(pseudo,))
 	info_connexion = cursor_temp.fetchall()
-	print(info_connexion)
 
 	frame_users = Frame(frame_salaire)
 	frame_users.grid(column=0, row=4, sticky=W, ipadx=400, ipady=160, padx=18, pady=15)
@@ -303,25 +374,14 @@ def salaire():
 	for n in info_connexion:
 		table.insert('', 'end', values=n)
 
-	#cursor_temp.execute('''SELECT * FROM temp WHERE pseudo_temp = ? ''',(pseudo,))
-	#total_heure =  cursor_temp.fetchone()[2]
-	#total_heure = str(total_heure)
-	#for x in total_heure:
-	#datetime_total = datetime.strptime(x, '%H:%M:%S')
-	#print(datetime_total)
-	#frame_total = Frame(frame_salaire)
-	#text = Label(frame_total,"Heures Totales : ")
-	#frame_total.grid()
-
-#recupere l'heure de connexion
 time_login = time.strftime('%H:%M:%S')
 datetime_login = datetime.strptime(time_login, "%H:%M:%S")
 jour_login = time.strftime('%d/%m/%y')
-db_temp = sqlite3.connect('database_login3.db')
+db_temp = sqlite3.connect('Database/database_login3.db')
 cursor_temp = db_temp.cursor()
 cursor_temp.execute('CREATE TABLE IF NOT EXISTS temp (pseudo_temp TEXT, jour TEXT, heure_login TEXT, heure_logout TEXT, heure_travail TEXT)')
 
-user = sqlite3.connect('user_database.db')
+user = sqlite3.connect('Database/user_database.db')
 cur = user.cursor()
 cur.execute('SELECT * FROM us_er')
 first_username = cur.fetchone()[1]
@@ -349,7 +409,6 @@ frame_communication.grid()
 frame_salaire = Frame(window, bg='#013D6B')
 frame_salaire.grid()
 
-
 menu_sup = tk.PanedWindow(window, background='blue', height=60, width=1280, orient=HORIZONTAL, bd=0)
 menu_sup.grid(column=0,row=0, sticky=W)
 button_accueil = tk.Button (menu_sup, text="Accueil",foreground='white', activebackground='cyan' , font=("Arial", 20), background='blue',  width=15, justify=CENTER, command=accueil) 
@@ -363,17 +422,13 @@ menu_sup.add(button_salaire)
 button_infos = tk.Menubutton (menu_sup, text=identity,foreground='white', activebackground='cyan' , font=("Arial", 20), background='blue', width=15, anchor='w',)
 menu_sup.add(button_infos)
 
-# Création d'un menu défilant
 deroulant_infos = Menu(button_infos, )
-deroulant_infos.add_command(label="Nom",) #command = instrution#
-deroulant_infos.add_command(label="Prénom", )
-deroulant_infos.add_command(label="Mail", )
+deroulant_infos.add_command(label="Nom")
+deroulant_infos.add_command(label="Prénom")
+deroulant_infos.add_command(label="Mail")
 deroulant_infos.add_command(label="déconnexion",background='red', command=logout)
-
-# Attribution du menu déroulant au menu Affichage
 button_infos.configure(menu=deroulant_infos)
 
-#Background
 icon = tk.PhotoImage(file='Image/bt.gif')
 window.iconphoto(True, icon)
 window.mainloop()

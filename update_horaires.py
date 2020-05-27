@@ -5,9 +5,9 @@ import os
 
 def delete_user():
     USER = ("'" + entry_User.get() + "'")
-    horaires = sqlite3.connect('horaires.db')
+    horaires = sqlite3.connect('Database/horaires.db')
     c_horaires = horaires.cursor()
-    c_horaires.execute('CREATE TABLE IF NOT EXISTS t_hor (user TEXT, lundi TEXT, mardi TEXT, mercredi TEXT, jeudi TEXT, vendredi TEXT, samedi TEXT, dimanche TEXT)')
+    c_horaires.execute('CREATE TABLE IF NOT EXISTS t_hor (user TEXT, lundi TEXT, mardi TEXT, mercredi TEXT, jeudi TEXT, vendredi TEXT, samedi TEXT, dimanche TEXT, lundi0 TEXT, mardi0 TEXT, mercredi0 TEXT, jeudi0 TEXT, vendredi0 TEXT, samedi0 TEXT, dimanche0 TEXT)')
     c_horaires.execute('DELETE FROM t_hor WHERE user = ' + USER)
     horaires.commit()
     horaires.close()
