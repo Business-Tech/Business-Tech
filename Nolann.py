@@ -53,12 +53,12 @@ def planning():
 	def is_pressed():
 		planning_db = sqlite3.connect('Database/planning.db')
 		c_planning = planning_db.cursor()
-		c_planning.execute('CREATE TABLE IF NOT EXISTS t_plan (user TEXT, date TEXT, tache TEXT)')
-		c_planning.execute('INSERT INTO t_plan VALUES (:user, :date, :tache)',
+		c_planning.execute('CREATE TABLE IF NOT EXISTS t_plan (user TEXT, date TEXT, note TEXT)')
+		c_planning.execute('INSERT INTO t_plan VALUES (:user, :date, :note)',
 			{
 				'user':current_user,
 				'date':calendar.get_date(),
-				'tache':entry_taches.get()
+				'note':entry_taches.get()
 			})
 		planning_db.commit()
 		planning_db.close()
@@ -76,8 +76,9 @@ def planning():
 	cur = user.cursor()
 	cur.execute('SELECT * FROM us_er')
 	current_user = cur.fetchone()[0]
+	current_admin = 'admin'
 
-	calendar = Calendar(left_frame, selectmode='day', year=2020, month=5, day=24)
+	calendar = Calendar(left_frame, selectmode='day')
 	calendar.grid(ipadx=300, ipady=240)
 	bt_get_date = Button(right_frame, command=is_pressed, bg='#4d4d4d', highlightthickness=0, bd=0)
 	bt_get_date.grid(row=5, ipadx=165)
@@ -85,30 +86,44 @@ def planning():
 	planning_db = sqlite3.connect('Database/planning.db')
 	c_planning = planning_db.cursor()
 	TT = ("'" + current_user + "'")
-	c_planning.execute("SELECT date, tache FROM t_plan WHERE user =" + TT)
+	AA = ("'" + current_admin + "'")
+	c_planning.execute("SELECT date, note FROM t_plan WHERE user =" + TT)
 	date_db = c_planning.fetchall()
+	c_planning.execute("SELECT date, note FROM t_plan WHERE user =" + AA)
+	date_ad = c_planning.fetchall()
 	
 	date=''
-	for d in date_db:
-		origin = str(d)
+	for db in date_db:
+		origin = str(db)
 		rm_comma = origin.replace(",", " : ")
 		rm_quotes = rm_comma.replace("'", "")
-		rm_par1 = rm_quotes.replace("(", "Pour le ")
+		rm_par1 = rm_quotes.replace("(", "")
 		rm_par2 = rm_par1.replace(")", "")
 		date += rm_par2 + '\n'
+
+	data=''
+	for ad in date_ad:
+		origin = str(ad)
+		rm_comma = origin.replace(",", " : ")
+		rm_quotes = rm_comma.replace("'", "")
+		rm_par1 = rm_quotes.replace("(", "")
+		rm_par2 = rm_par1.replace(")", "")
+		data += rm_par2 + '\n'
 
 	horaires = sqlite3.connect('Database/horaires.db')
 	c_horaires = horaires.cursor()
 	c_horaires.execute('SELECT * FROM t_hor')
 	act_user = c_horaires.fetchone()[0]
 
-	info = Label(right_frame, text='Tâches', bg='#4d4d4d', fg='white')
+	info = Label(right_frame, text='NOTES', bg='#4d4d4d', fg='white')
 	info.grid(row=3, pady=2)
 	info2 = Label(right_frame, text='EDT', bg='#4d4d4d', fg='white')
 	info2.grid(row=0, pady=2)
-	taches = Label(frame_taches, text=date, bg='white')
-	taches.grid()
+	full = date + data
+	notes = Label(frame_taches, text=full, bg='white')
+	notes.grid()
 	var = StringVar()
+	var.set('Take a Note')
 	entry_taches = Entry(right_frame, textvariable=var)
 	entry_taches.grid(row=5, ipadx=80, pady=6)
 
@@ -342,30 +357,74 @@ def salaire():
 		datetime_salaire = datetime.strptime(time_salaire,"%H:%M:%S")
 		clock2.config(text=datetime_salaire-datetime_login)
 		clock2.after(200, temp_login)
-		
-	texte_horloge = Label(frame_horloge, text="Heure Actuelle")
-	texte_horloge.pack()
-	clock = Label(frame_horloge, font=('times', 20, 'bold'))
-	clock.pack(fill=BOTH, expand=1)
-	tick()
-	frame_horloge.grid(pady=10)
 
-	frame_restant=Frame(frame_salaire, bg ='snow')
-	texte_restant = Label(frame_restant, text="Temp de connexion")
-	texte_restant.pack()
-	clock2 = Label(frame_restant, font=('times', 20, 'bold'))
-	clock2.pack(fill=BOTH, expand=1)
+	frame_top = Frame(frame_salaire, bg='#013D6B')
+	frame_bot = Frame(frame_salaire)
+	frame_top1 = Frame(frame_top)
+	frame_top2 = Frame(frame_top)
+	frame_top3 = Frame(frame_top)
+	frame_top.grid(column=0, row=0, pady=50)
+	frame_bot.grid(column=0, row=1, sticky=W, ipadx=400, ipady=160, padx=18, pady=15)
+	frame_top1.grid(column=0, row=0)
+	frame_top2.grid(column=1, row=0)
+	frame_top3.grid(column=2, row=0)
+	frame_bot.grid_propagate(0)
+
+	banner = Label(frame_top2, text='TIME', fg='white', bg='#4d4d4d')
+	banner.grid(column=0, row=0, ipadx=40, ipady=2)
+	texte_horloge = Label(frame_top2, text="Heure Actuelle")
+	texte_horloge.grid(column=0, row=1)
+	clock = Label(frame_top2, font=('times', 20, 'bold'))
+	clock.grid(column=0, row=2)
+	tick()
+	frame_top2.grid(pady=10)
+
+	texte_restant = Label(frame_top2, text="Temp de connexion")
+	texte_restant.grid(column=0, row=3)
+	clock2 = Label(frame_top2, font=('times', 20, 'bold'))
+	clock2.grid(column=0, row=4)
 	temp_login()
-	frame_restant.grid()
 
 	cursor_temp.execute('''SELECT jour, heure_login, heure_logout, heure_travail FROM temp WHERE pseudo_temp = ? ''',(pseudo,))
 	info_connexion = cursor_temp.fetchall()
 
-	frame_users = Frame(frame_salaire)
-	frame_users.grid(column=0, row=4, sticky=W, ipadx=400, ipady=160, padx=18, pady=15)
-	frame_users.grid_propagate(0)
+	PSEUDO = ("'" + pseudo + "'")
+	sal = Label(frame_top1, text='                                         ')
+	heure = Label(frame_top3, text='                                       ')
+	sal.grid(column=0, row=1, ipady=20)
+	heure.grid(column=0, row=1, ipady=20)
+	db_sal = sqlite3.connect('Database/salaire.db')
+	cursor_sal = db_sal.cursor()
+	cursor_sal.execute('CREATE TABLE IF NOT EXISTS sal (pseudo TEXT, sal_month TEXT, sal_hour TEXT)')
+	cursor_sal.execute('SELECT sal_month FROM sal WHERE pseudo=' + PSEUDO)
+	month = cursor_sal.fetchall()
+	months = str(month) + '€'
+	rm_comma = months.replace(",", "")
+	rm_quotes = rm_comma.replace("'", "")
+	rm_par1 = rm_quotes.replace("(", "")
+	rm_par2 = rm_par1.replace(")", "")
+	rm_ac1 = rm_par2.replace("[", "")
+	rm_ac2 = rm_ac1.replace("]", "")
+	cursor_sal.execute('SELECT sal_hour FROM sal WHERE pseudo=' + PSEUDO)
+	hour = cursor_sal.fetchall()
+	hours = str(hour) + '€'
+	comma = hours.replace(",", "")
+	quotes = comma.replace("'", "")
+	par1 = quotes.replace("(", "")
+	par2 = par1.replace(")", "")
+	ac1 = par2.replace("[", "")
+	ac2 = ac1.replace("]", "")
+	sal = Label(frame_top1, text=rm_ac2)
+	heure = Label(frame_top3, text=ac2)
+	sal.grid(column=0, row=1, ipady=20)
+	heure.grid(column=0, row=1, ipady=20)
 
-	table = ttk.Treeview(frame_users, columns=(1,2,3,4), show='headings', height=26)
+	print_mois = Label(frame_top1, text='Salaire / Mois', fg='white', bg='#4d4d4d')
+	print_heures = Label(frame_top3, text='Salaire / Heures', fg='white', bg='#4d4d4d')
+	print_mois.grid(column=0, row=0, ipadx=34, ipady=3)
+	print_heures.grid(column=0, row=0, ipadx=28, ipady=3)
+
+	table = ttk.Treeview(frame_bot, columns=(1,2,3,4), show='headings', height=26)
 	table.grid()
 	table.heading(1, text='Jour')
 	table.heading(2, text='Heure de connexion')
@@ -422,10 +481,7 @@ menu_sup.add(button_salaire)
 button_infos = tk.Menubutton (menu_sup, text=identity,foreground='white', activebackground='cyan' , font=("Arial", 20), background='blue', width=15, anchor='w',)
 menu_sup.add(button_infos)
 
-deroulant_infos = Menu(button_infos, )
-deroulant_infos.add_command(label="Nom")
-deroulant_infos.add_command(label="Prénom")
-deroulant_infos.add_command(label="Mail")
+deroulant_infos = Menu(button_infos)
 deroulant_infos.add_command(label="déconnexion",background='red', command=logout)
 button_infos.configure(menu=deroulant_infos)
 

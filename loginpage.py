@@ -16,28 +16,52 @@ def verif():
 
 	for i in user_list:
 		if ident in i:
-			for m in user_mdp:
-				if passw in m:
-					PASS = ("'" + ID.get() + "'")
-					cursor.execute("SELECT * FROM login WHERE id = " + PASS)
-					iid = cursor.fetchone()[0]
-					cursor.execute("SELECT * FROM login WHERE id = " + PASS)
-					first = cursor.fetchone()[1]
-					cursor.execute("SELECT * FROM login WHERE id = " + PASS)
-					last = cursor.fetchone()[2]
-					user = sqlite3.connect('Database/user_database.db')
-					cur = user.cursor()
-					cur.execute('CREATE TABLE IF NOT EXISTS us_er (id TEXT, first_name TEXT, last_name TEXT)')
-					cur.execute('INSERT INTO us_er VALUES (:id, :first_name, :last_name)',
-						{
-							'id':''+iid,
-							'first_name':''+first,
-							'last_name':''+last
-						})
-					user.commit()
-					user.close()
-					window.destroy()
-					os.system("python Nolann.py")
+			if ident == 'admin':
+				for m in user_mdp:
+					if passw in m:
+						PASS = ("'" + ID.get() + "'")
+						cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+						iid = cursor.fetchone()[0]
+						cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+						first = cursor.fetchone()[1]
+						cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+						last = cursor.fetchone()[2]
+						user = sqlite3.connect('Database/user_database.db')
+						cur = user.cursor()
+						cur.execute('CREATE TABLE IF NOT EXISTS us_er (id TEXT, first_name TEXT, last_name TEXT)')
+						cur.execute('INSERT INTO us_er VALUES (:id, :first_name, :last_name)',
+							{
+								'id':''+iid,
+								'first_name':''+first,
+								'last_name':''+last
+							})
+						user.commit()
+						user.close()
+						window.destroy()
+						os.system("python admin.py")
+			else:
+				for m in user_mdp:
+					if passw in m:
+						PASS = ("'" + ID.get() + "'")
+						cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+						iid = cursor.fetchone()[0]
+						cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+						first = cursor.fetchone()[1]
+						cursor.execute("SELECT * FROM login WHERE id = " + PASS)
+						last = cursor.fetchone()[2]
+						user = sqlite3.connect('Database/user_database.db')
+						cur = user.cursor()
+						cur.execute('CREATE TABLE IF NOT EXISTS us_er (id TEXT, first_name TEXT, last_name TEXT)')
+						cur.execute('INSERT INTO us_er VALUES (:id, :first_name, :last_name)',
+							{
+								'id':''+iid,
+								'first_name':''+first,
+								'last_name':''+last
+							})
+						user.commit()
+						user.close()
+						window.destroy()
+						os.system("python Nolann.py")
 
 window = tk.Tk()
 window.title('BusinessTech')
