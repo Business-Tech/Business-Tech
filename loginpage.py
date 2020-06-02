@@ -61,7 +61,7 @@ def verif():
 						user.commit()
 						user.close()
 						window.destroy()
-						os.system("python Nolann.py")
+						os.system("python user.py")
 
 window = tk.Tk()
 window.title('BusinessTech')

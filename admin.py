@@ -381,7 +381,7 @@ def communication():
 	Text.set('Say Something')
 	entry = Entry(frame_text, textvariable=Text, width=30, bg='white')
 	entry.grid(row=2, ipadx=120, ipady=1)
-	Buttonn_remove = Button(frame_users, text='Cliquer ici pour supprimer la conversation', command=remove, bg='#4d4d4d', fg='white', highlightthickness=0, bd=0)
+	Buttonn_remove = Button(frame_users, text='Cliquer ici pour supprimer toutes les conversations', command=remove, bg='#4d4d4d', fg='white', highlightthickness=0, bd=0)
 	Buttonn_remove.grid(row=2, ipadx=100, pady=4)
 	full_mess = full_mess_by + full_mess_to
 	query_text = Label(frame_label_text, text=full_mess, bg='white')
