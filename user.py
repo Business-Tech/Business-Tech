@@ -459,6 +459,15 @@ window.resizable(width=False, height=False)
 
 identity = ("Nom : " +last_username + "\n Prénom : " + first_username)
 
+frame_accueil = Frame(window, bg='#013D6B')
+frame_accueil.grid()
+frame_planning = Frame(window, bg='#013D6B')
+frame_planning.grid()
+frame_communication = Frame(window, bg='#013D6B')
+frame_communication.grid()
+frame_salaire = Frame(window, bg='#013D6B')
+frame_salaire.grid()
+
 menu_sup = tk.PanedWindow(window, background='blue', height=60, width=1280, orient=HORIZONTAL, bd=0)
 menu_sup.grid(column=0,row=0, sticky=W)
 button_accueil = tk.Button (menu_sup, text="Accueil",foreground='white', activebackground='cyan' , font=("Arial", 20), background='blue',  width=15, justify=CENTER, command=accueil) 
@@ -471,17 +480,6 @@ button_salaire = tk.Button (menu_sup, text="Salaire",foreground='white', activeb
 menu_sup.add(button_salaire)
 button_infos = tk.Menubutton (menu_sup, text=identity,foreground='white', activebackground='cyan' , font=("Arial", 20), background='blue', width=15, anchor='w',)
 menu_sup.add(button_infos)
-
-frame_accueil = Frame(window, bg='#013D6B')
-frame_accueil.grid()
-frame_planning = Frame(window, bg='#013D6B')
-frame_planning.grid()
-frame_communication = Frame(window, bg='#013D6B')
-frame_communication.grid()
-frame_salaire = Frame(window, bg='#013D6B')
-frame_salaire.grid()
-
-accueil()
 
 deroulant_infos = Menu(button_infos)
 deroulant_infos.add_command(label="déconnexion",background='red', command=logout)
